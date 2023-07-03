@@ -1,0 +1,268 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>Encryption and Decryption App</title>-->
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            padding: 20px;-->
+<!--        }-->
+<!--        h1, h2, h3 {-->
+<!--            margin-top: 30px;-->
+<!--            margin-bottom: 15px;-->
+<!--        }-->
+<!--        form {-->
+<!--            margin-bottom: 30px;-->
+<!--        }-->
+<!--        label {-->
+<!--            font-weight: bold;-->
+<!--        }-->
+<!--        textarea {-->
+<!--            resize: vertical;-->
+<!--        }-->
+<!--        #result {-->
+<!--            margin-top: 30px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h1>Encryption and Decryption App</h1>-->
+
+<!--    <h2>Encryption</h2>-->
+<!--    <form id="encryptionForm" enctype="multipart/form-data">-->
+<!--        <div class="form-group">-->
+<!--            <label for="plaintextFile">Plaintext File:</label>-->
+<!--            <input type="file" class="form-control-file" id="plaintextFile" name="plaintextFile" required>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="encryptionKey">Encryption Key:</label>-->
+<!--            <textarea class="form-control" id="encryptionKey" name="encryptionKey" rows="5" cols="50" required></textarea>-->
+<!--        </div>-->
+
+<!--        <button type="button" class="btn btn-primary" onclick="encrypt()">Encrypt</button>-->
+<!--    </form>-->
+
+<!--    <hr>-->
+
+<!--    <h2>Decryption</h2>-->
+<!--    <form id="decryptionForm" enctype="multipart/form-data">-->
+<!--        <div class="form-group">-->
+<!--            <label for="encryptedFile">Encrypted File:</label>-->
+<!--            <input type="file" class="form-control-file" id="encryptedFile" name="encryptedFile" required>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="decryptionKey">Decryption Key:</label>-->
+<!--            <textarea class="form-control" id="decryptionKey" name="decryptionKey" rows="5" cols="50" required></textarea>-->
+<!--        </div>-->
+
+<!--        <button type="button" id="downloadKeyButton" class="btn btn-primary" onclick="decrypt()">Decrypt</button>-->
+<!--    </form>-->
+
+<!--    <h3>Results:</h3>-->
+<!--    <div id="result"></div>-->
+<!--<script>-->
+<!--    // Load encryption key from backend-->
+<!--    // fetch('/encryptionKey')-->
+<!--    //     .then(response => response.text())-->
+<!--    //     .then(data => {-->
+<!--    //         document.getElementById('encryptionKey').value = data;-->
+<!--    //     })-->
+<!--    //     .catch(error => {-->
+<!--    //         console.error('Failed to load encryption key:', error);-->
+<!--    //     });-->
+
+<!--    function encrypt() {-->
+<!--        const plaintextFile = document.getElementById('plaintextFile').files[0];-->
+<!--        const encryptionKey = document.getElementById('encryptionKey').value;-->
+
+<!--        const formData = new FormData();-->
+<!--        formData.append('plaintextFile', plaintextFile);-->
+<!--        formData.append('encryptionKey', encryptionKey);-->
+
+<!--        fetch('/encrypt', {-->
+<!--            method: 'POST',-->
+<!--            body: formData-->
+<!--        })-->
+<!--            .then(response => response.blob())-->
+<!--            .then(blob => {-->
+<!--                const url = URL.createObjectURL(blob);-->
+<!--                const link = document.createElement('a');-->
+<!--                link.href = url;-->
+<!--                link.download = 'encrypted_data.csv';-->
+<!--                link.click();-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error('Encryption failed:', error);-->
+<!--                document.getElementById('result').textContent = 'Encryption failed. Please check the console for details.';-->
+<!--            });-->
+<!--    }-->
+
+<!--    function decrypt() {-->
+<!--        const encryptedFile = document.getElementById('encryptedFile').files[0];-->
+<!--        const decryptionKey = document.getElementById('decryptionKey').value;-->
+<!--        const encryptionKey = document.getElementById('encryptionKey').value; // Get the encryption key-->
+
+<!--        if (decryptionKey !== encryptionKey) {-->
+<!--            alert("Decryption key is different from the encryption key. Please enter the correct key.");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        const formData = new FormData();-->
+<!--        formData.append('encryptedFile', encryptedFile);-->
+<!--        formData.append('decryptionKey', decryptionKey);-->
+
+<!--        fetch('/decrypt', {-->
+<!--            method: 'POST',-->
+<!--            body: formData-->
+<!--        })-->
+<!--            .then(response => response.blob())-->
+<!--            .then(blob => {-->
+<!--                const url = URL.createObjectURL(blob);-->
+<!--                const link = document.createElement('a');-->
+<!--                link.href = url;-->
+<!--                link.download = 'decrypted_data.csv';-->
+<!--                link.click();-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error('Decryption failed:', error);-->
+<!--                document.getElementById('result').textContent = 'Decryption failed. Please check the console for details.';-->
+<!--            });-->
+<!--    }-->
+<!--    $('#downloadKeyButton').click(function() {-->
+<!--        var publicKey = $('#encryptionKey').val();-->
+<!--        downloadKey(publicKey);-->
+<!--    });-->
+
+<!--    function downloadKey(publicKey) {-->
+<!--        var element = document.createElement('a');-->
+<!--        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(publicKey));-->
+<!--        element.setAttribute('download', 'public_key.txt');-->
+<!--        element.style.display = 'none';-->
+<!--        document.body.appendChild(element);-->
+<!--        element.click();-->
+<!--        document.body.removeChild(element);-->
+<!--    }-->
+<!--</script>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Decryption</title>
+</head>
+<style>
+    textarea {
+        width: 400px;
+        height: 200px;
+    }
+</style>
+<body>
+<h1>File Decryption</h1>
+
+<form method="POST" action="/decrypt" enctype="multipart/form-data">
+    <label for="encryptedFile">Select encrypted file:</label>
+    <input type="file" id="encryptedFile" name="encryptedFile" required><br><br>
+
+    <label for="decryptionKey">Decryption key:</label>
+    <textarea type="text" id="decryptionKey" name="decryptionKey" hidden="true">-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+mQINBGST8vsBEADKXK7qMUOuWyQW/y0kCPnlpRBCrenptEhEOlaiwEO+M8f685Mc
+6kxwJ0xdAs4bD2SkVpDkV2iR/BQe1Dd8UjS76T/nx5uICfAXVoR0cVoZqh5zVidA
+TKGkmxAA0Xz+/3FY8c0va7nHwaFbUB3Vcy/JqB0q2Im88pUDcl4NOyLbhdUKtv1W
+Yuw3LTC6SKcIaycbEeBZGosOKw9MUlwcLzdpXGOVo4h7yzEy7AyjSv+WnV3y6V4P
+1ncZ0XDh/FwPQ93AZi8+cSnipLfirxFAqcxSPM+Efrvlti/oWe3iME380spUPb2O
++tsZZTUGpqCYNrw2x13wtBX5kuSBcVmcKqWr4pKJP17lKZ/MA4Bd4/5YlDdKLGlR
+i94pkrdrhk0EYutWDCHq5BYrkC9vABKUERYeZLlTTdeMfa/FOOFLUT1YXO9zzFTz
+W+ulOIVTMpeTTPWSP2DPEIdvTXvzBy0Evs6dzIgmFu9mCC/3cCQrM1vJc52vM8Mc
+mbcTj7FKEdYzAixGMTjo9BOSPNLLCa4ivtQnpMp4du/Qn0QDId4n8cTFNaSrYge/
+z0XhxmBVET9BUFzlxjtOasEZwkuWTYCnDntwXG/VdwF4q9uNijDx381wUdA7rOkE
+n55YpRga8FOVixTrd98+YqW7XZlQEqNDTrln1rooaskEtW30SdZ7/j3AtQARAQAB
+tA1yYW5kb20gPG5vbmU+iQI2BBMBCgAgBQJkk/L7AhsDBQsJCAcDBRUKCQgLBBYC
+AQACHgECF4AACgkQSlBpx0eLTzROVA/7B854brqpprtoIx3kz6TODnPfsAsdYXQL
+BzVWTof/zSX82EvBoiqWElF8LBJn3KCzySURQQ9WY16ysrkz/G6WM8XDuC0r9W52
+cXaUk6I/QzEwFDMnogOBAb/dYVPU9bhlqnFFVNIvsHCHhY9aX+G0vMXI7jBpc1To
+/JoSf/bkXdu7dqK2KEO5ot18YdKelBTdeW8hBEc39b44YtcJXr6v9iWceCziKxe1
+QmIl6xghuYxRV1mxLW43tOkSh+/Z5bFbQvyh+H0DqSNlVZhBb9HMdZaZUAkgTJIA
+FW1sJgpjRgngGOCh++PNNDGPmvOoSc2BaXTwNHZtRxvd7sJ2Kq5O2T1yWqvZrT4o
+JUEfvH3sM5YW5tr9NuaccjhmpCplRgwKkJybB0Zvr5X3UecKyyUjVa7EkhCcLFM6
+jnEoxc6gJPsWwBBCrHgFs5PJU4o35YVPt/Cb+soKtAxpdhkSRIhmu83AtL3WI9b3
+Ue2PvxhOMo3nbBl0tLvDNQzhDehr6a0KZxGMK8HIcEhJ1Q43kEuHhskOPL3hw8Rt
+w0rnUJ3NwbhG+8M661KgB6rcs7HTXugQ9sBtc/kXyDBTF8C66jSMfAumbM9eKDNp
+/dHNCaomdF6ee1FuVL1P44/EEZrueZWNmGtBR0mU+6OH4gfcIDSQ/qwvTiVVMnsd
+4pI0dZSseXO5Ag0EZJPy+wEQAL/lKPt1XoyFH9BljddRnRHWcNC41xgAzE17KoBH
+8EO3mlUIFi1OiSka6YBdIYkExsDvn8Bk91LK2CQ3pdMmhiN5tBfufe+Xd4/cy5UE
+lI26aCwBHv8B9q8RdNyW/AmkEKzJZAHCY5YyHufgL/qAbJ0qX2svZKS2Av498wCE
+Hn7Keejotg1rL3dP4dlDlWFYXQcRVh5+SqQmU5gT9amKHZ/eMo2TmOZMBM2zQ3oo
+bVNHPZvb/I3XRqs4WQjuJnRo8Ml3HRzDPwLTYevSXPICAAQ8q77MCuFRkgpFOGRm
+/pRrmDB1StOuOezpfspOs0IPQyhYhxhb2UZbWwRc3igBHolaMOCrMhSdlEcEbtxr
+F6K8FW1AmFkSyl5W7nCt7ppjREH3c0SM02BQzxq4y+GxvPrlPRrW8do2JDQJoVTG
+6CKF3UPW3fO2/U/NxORynHfFRc29U3UwV2zVXM3Wpoyj1f7KwwTGS5Exlo6veQvD
+psleKSiYvCJpd+g7LGxk/j3dY4zd9WXk7PHX1whwRolqo9Uee23Xh8SjSwx6l3tq
+MD0IqB/MWPuZbD1bftHs3qsEzfFiUE7J6+nf2UnoVpGLzwUsZSwV9bqUI2uq5n8J
+W5bdsuqI83x8RgqqlgWTQqsBqGg6OrqBG8QH5byy1XDYGCeEutQ+ycui4qQHk8yN
+R9eTABEBAAGJAh8EGAEKAAkFAmST8vsCGwwACgkQSlBpx0eLTzQ4ug/+LqTZxWA5
+sXLlRWDG34Cu6dVGHC2IzUmn1yu28JmlwCGe2X7smhNQeOY1lRrTBkwfIKEWELRC
+b/r4hdxHcPXx5ZbRAAv/6njBU02wMbJhp17c5sMo+M6xnQRwhiReTqKve808AL4C
+vu/Z6W5a1NAKx7OAvpbg+IEkf/CimRGQeotcLhGhu/bXa8gmD96IDwrZeTfHcEh+
+oH/jGBXthbfJSJVwurB+zs/NhljzXP5sfXONG1Hphau4DqCIX1LGEQEVaM/uGNmk
+emx1e7lFTTJL35rxgGHrJua1AaKyYRi0I1/lfssRQ2cbEe/MvIr0HGulfY4J8l40
+MGJ3s4xZngsyK8Y5EGHfyaejV+CFQfldMdWzsCAYQ5bea2fXw8p1rupWirv5n8KR
+RrqroGjXHaR89gNUIOZq/BglAufBEk3ekAvqzpgarr6zKK1vckhoy8Y7TAQS0OGx
+yDx72YykQqDMJf+vqIBI8CH8Pm6WRp5YLqJGQlUkGMpR19cpfJtd8DWoUILzbv9Y
+2wGYGssXbgh7rXkWiuBp37hm6FyvlDxp9bYfeTpXFIEUcV2QGXHe7RajFQ6+O2Xs
+t5QO4xNduwNgZtGA7HwUuTcoVMQi/bQu8ZKSILPWEt/w+xwAVpNOTuABTLtw2Lyy
+6UsYP69TClkeRCj662Xot0OUQq8NpfMFXtQ=
+=J5wj
+-----END PGP PUBLIC KEY BLOCK-----</textarea><br><br>
+
+    <button type="submit">Decrypt File</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    const form = document.querySelector('form');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const encryptedFile = document.getElementById('encryptedFile').files[0];
+        const decryptionKey = document.getElementById('decryptionKey').value;
+
+        const formData = new FormData();
+        formData.append('encryptedFile', encryptedFile);
+        formData.append('decryptionKey', decryptionKey);
+
+        try {
+            const response = await fetch('/decrypt', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const downloadUrl = URL.createObjectURL(blob);
+
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = 'decrypted_data.csv';
+                link.textContent = 'Click here to download the decrypted file';
+
+                resultDiv.textContent = '';
+                resultDiv.appendChild(link);
+            } else {
+                resultDiv.textContent = 'Error occurred during file decryption';
+            }
+        } catch (error) {
+            resultDiv.textContent = 'An error occurred: ' + error.message;
+        }
+    });
+</script>
+</body>
+</html>
